@@ -1,147 +1,117 @@
-# 🤖 AI Job Market, Skill Demand & Job Displacement Prediction System
+# 🔮 FutureLens
+
+## AI Job Market Intelligence, Skill Recommendation & Career Prediction System
+
+---
 
 ## 🌍 Overview
 
-This project is a **machine learning-based system** designed to analyze job market data and predict future trends in employment. It identifies **in-demand skills**, forecasts **job growth**, and estimates the **risk of job displacement due to AI and automation**.
+**FutureLens** is an AI-powered career intelligence platform that analyzes job market data to predict future opportunities, identify emerging skills, and guide users with **personalized learning paths**.
 
-The system integrates **historical datasets** with **real-time signals** to provide intelligent insights for students and professionals.
+The system not only predicts **job growth and AI risk**, but also recommends **skills to learn** and **resources to follow**, making it a complete solution for career planning in an AI-driven world.
 
 ---
 
 ## 🎯 Objectives
 
-* 📊 Identify trending skills in the job market
-* 🔮 Predict future demand for job roles
-* 🤖 Estimate AI-based job displacement risk
-* 🎓 Recommend skills and career paths
+* 🔮 Predict future job opportunities
+* 🌱 Identify emerging (blooming) skills
+* 🤖 Estimate AI-driven job displacement risk
+* 📊 Analyze current job market demand
+* 🎓 Recommend skills and learning resources
 
 ---
 
 ## ⚙️ Key Features
 
-### 📊 Skill Demand Analysis
+### 🔍 Job Insight Engine
 
-Extracts and analyzes job postings to identify **high-demand skills** such as Python, AI, Cloud, etc.
+For any selected job role, the system provides:
 
-### 🔮 Job Growth Prediction
-
-Predicts whether a job role will:
-
-* 🚀 Grow
-* 📈 Remain stable
-* 📉 Decline
-
-### 🤖 Automation Risk Detection
-
-Classifies jobs into:
-
-* ✅ Low Risk
-* ⚠️ Medium Risk
-* ❌ High Risk
-
-### 🎓 Career Recommendation
-
-Suggests skills required to stay relevant in an AI-driven job market.
+* 📈 Demand trend (growing / declining)
+* 🤖 AI risk level (safe / replaceable)
+* 💰 Salary insights (if available)
 
 ---
 
-## 📂 Datasets Used
+### 🌱 Skill Recommendation System
 
-### 1. Job Postings Dataset
-
-* Source: Kaggle
-* Contains job titles, skills, company details
-
-### 2. Automation Risk Dataset
-
-* Source: OECD / Frey & Osborne
-* Provides probability of job automation
-
-### 3. Future Job Trends Dataset
-
-* Source: World Economic Forum
-* Contains emerging and declining roles
-
-### 4. Google Trends (Real-Time Data)
-
-* Used to track **live skill demand**
+* Identifies **skills required** for each job
+* Highlights **emerging & future-proof skills**
+* Suggests skill upgrades based on trends
 
 ---
 
-## 🧠 System Architecture
+### 📚 Learning Resource Suggestion
 
-```
-Job Postings Data ──► Demand Analysis
-                         │
-Google Trends ─────────► Trend Score
-                         │
-Automation Dataset ───► Risk Score
-                         │
-                         ▼
-              Hybrid Prediction Model
-                         │
-                         ▼
-     Job Growth + AI Risk Classification
-```
+* Recommends **courses, platforms, and materials**
+* Helps users build a structured learning path
+* Bridges the gap between **current skills → required skills**
 
 ---
 
-## 🛠 Technologies Used
+### 🔮 Future Job Prediction
 
-* 🐍 Python
-* 📚 Pandas, NumPy
-* 🤖 Scikit-learn
-* 📊 Matplotlib / Seaborn
-* 🌐 PyTrends (Google Trends API)
+* Predicts **new and emerging job roles**
+* Identifies jobs that will:
+
+  * 🚀 Grow
+  * 📈 Stay stable
+  * 📉 Decline
 
 ---
 
-## ⚙️ Implementation Workflow
+### 🤖 AI Automation Risk Analysis
+
+* Classifies jobs into:
+
+  * ✅ Safe (Low Risk)
+  * ⚠️ Moderate Risk
+  * ❌ High Risk (Replaceable)
+
+---
+
+## ⚙️ Workflow
 
 1. 📂 Data Collection
 2. 🧹 Data Cleaning & Preprocessing
 3. 📊 Feature Engineering
 
    * Demand Score
-   * Trend Score
+   * Skill Trend Score
    * Automation Risk
 4. 🔗 Dataset Integration
-5. 🧠 Model Building
-6. 📉 Prediction & Visualization
-
----
-
-## 🧮 Prediction Logic
-
-The system uses a **hybrid scoring model**:
-
-* Job Demand ↑ → Growth ↑
-* Skill Trends ↑ → Growth ↑
-* Automation Risk ↑ → Growth ↓
+5. 🧠 Prediction Model
+6. 🎯 Recommendation Engine
+7. 📉 Visualization & Output
 
 ---
 
 ## 📊 Sample Output
 
-| Job Role         | Growth Prediction | AI Risk   |
-| ---------------- | ----------------- | --------- |
-| AI Engineer      | 🚀 High Growth    | Low ✅     |
-| Data Analyst     | 📈 Moderate       | Medium ⚠️ |
-| Data Entry Clerk | 📉 Declining      | High ❌    |
+| Feature            | Output                    |
+| ------------------ | ------------------------- |
+| Job Role           | AI Engineer               |
+| Growth Prediction  | 🚀 High                   |
+| AI Risk            | Low ✅                     |
+| Required Skills    | Python, ML, Deep Learning |
+| Emerging Skills    | Generative AI, MLOps      |
+| Learning Resources | Coursera, YouTube, Docs   |
 
 ---
 
 ## 🎓 Use Cases
 
-* Students choosing career paths
+* Students planning careers
 * Professionals upgrading skills
-* Organizations analyzing workforce trends
+* Career guidance platforms
+* Workforce analytics
 
 ---
 
 ## 📌 Key Insight
 
-> This system combines **historical automation data with real-time job market trends** to generate accurate predictions about the future of jobs.
+> FutureLens goes beyond prediction by providing **actionable career guidance**, combining job trends, skill demand, AI risk, and personalized learning recommendations.
 
 ---
 
@@ -150,5 +120,11 @@ The system uses a **hybrid scoring model**:
 **Nithivarsha T P - 036**
 **Purushothaman B - 039**
 **Srisaran J      - 306**
+
+---
+
+## ⭐ Contribute
+
+Feel free to fork and enhance this project 🚀
 
 ---
