@@ -457,47 +457,48 @@ st.markdown("")
 # ---------------------------
 st.markdown("<div class='section-header'>🤖 AI Automation Risk Overview</div>", unsafe_allow_html=True)
 
-risk_counts = {'High': 0, 'Medium': 0, 'Low': 0}
-
-for _, row in df.iterrows():
-    top_risk = max(row['ai_risk_distribution'], key=row['ai_risk_distribution'].get)
-    risk_counts[top_risk] += 1
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.markdown(f"""
-    <div class="metric-card" style="border-left: 4px solid #ef4444;">
-        <div style="font-size: 28px; margin-bottom: 10px;">🔴</div>
-        <div class="metric-label">High Risk</div>
-        <div class="metric-value">{risk_counts['High']}</div>
-        <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown(f"""
-    <div class="metric-card" style="border-left: 4px solid #f59e0b;">
-        <div style="font-size: 28px; margin-bottom: 10px;">🟡</div>
-        <div class="metric-label">Medium Risk</div>
-        <div class="metric-value">{risk_counts['Medium']}</div>
-        <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    st.markdown(f"""
-    <div class="metric-card" style="border-left: 4px solid #10b981;">
-        <div style="font-size: 28px; margin-bottom: 10px;">🟢</div>
-        <div class="metric-label">Low Risk</div>
-        <div class="metric-value">{risk_counts['Low']}</div>
-        <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("")
-
-# ---------------------------
+try:
+    risk_counts = df['ai_risk'].value_counts().to_dict()
+    
+    high_risk = risk_counts.get('High Risk', 0)
+    med_risk = risk_counts.get('Medium Risk', 0) + risk_counts.get('Medium', 0)
+    low_risk = risk_counts.get('Low Risk', 0) + risk_counts.get('Safe', 0)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="metric-card" style="border-left: 4px solid #ef4444;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🔴</div>
+            <div class="metric-label">High Risk</div>
+            <div class="metric-value">{high_risk}</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown(f"""
+        <div class="metric-card" style="border-left: 4px solid #f59e0b;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🟡</div>
+            <div class="metric-label">Medium Risk</div>
+            <div class="metric-value">{med_risk}</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown(f"""
+        <div class="metric-card" style="border-left: 4px solid #10b981;">
+            <div style="font-size: 28px; margin-bottom: 10px;">🟢</div>
+            <div class="metric-label">Low Risk</div>
+            <div class="metric-value">{low_risk}</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("")
+except Exception as e:
+    st.info("⚠️ AI Risk analysis not available")
 # 🔹 RECOMMENDATIONS
 # ---------------------------
 st.markdown("<div class='section-header'>✅ Career Recommendations</div>", unsafe_allow_html=True)
