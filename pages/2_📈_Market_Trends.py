@@ -10,11 +10,6 @@ import plotly.express as px
 import sys
 sys.path.insert(0, '.')
 
-try:
-    from ml_utils import TrendForecaster
-except:
-    pass
-
 st.set_page_config(page_title="Market Trends", layout="wide", initial_sidebar_state="expanded")
 
 # Custom CSS
@@ -53,18 +48,12 @@ df = load_data()
 trend_df = load_trend_data()
 role_summary = load_role_summary()
 
-# Initialize forecaster
-try:
-    forecaster = TrendForecaster(df, trend_df) if trend_df is not None else None
-except:
-    forecaster = None
-
 st.markdown("## 📈 Market Trends & Future Forecasts")
 st.markdown("*Analyze demand trends, identify emerging roles, and predict future opportunities*")
 st.divider()
 
 # Create tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Overview", "📈 Demand Trends", "🌟 Emerging Roles", "🎓 Skill Trends", "💡 Insights"])
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Overview", "📈 Demand Trends", "🌟 Top Roles", "💡 Insights"])
 
 # ===============================================================================
 # TAB 1: MARKET OVERVIEW
@@ -179,140 +168,67 @@ with tab2:
                             pd.to_datetime(role_trend_data['posted_date'].min())).days
                 st.metric("📅 Time Span", f"{days_span} days")
     else:
-        st.info("⚠️ Trend data not available. Please check the trend CSV file.")
+        st.info("⚠️ Trend data not available")
 
 # ===============================================================================
-# TAB 3: EMERGING ROLES & FUTURE OPPORTUNITIES
+# TAB 3: TOP ROLES & OPPORTUNITIES
 # ===============================================================================
 with tab3:
-    st.markdown("### 🌟 Emerging & Growing Roles")
+    st.markdown("### 🌟 Top Roles by Demand")
     
-    if role_summary is not None:
-        # Sort by job_count for top roles
-        top_roles = role_summary.nlargest(10, 'job_count')
+    try:
+        top_roles = df.nlargest(10, 'avg_salary')[['role', 'avg_salary', 'ai_risk']]
         
-        col_emerging, col_declining  = st.columns([0.5, 0.5])
-        
-        with col_emerging:
-            st.markdown("#### 📈 TOP ROLES BY DEMAND")
+        for idx, (_, row) in enumerate(top_roles.iterrows(), 1):
+            col1, col2, col3, col4 = st.columns([0.4, 0.2, 0.2, 0.2])
             
-            try:
-                top_5 = role_summary.nlargest(5, 'job_count')
-                for idx, (_, row) in enumerate(top_5.iterrows(), 1):
-                    salary = row.get('avg_salary', 0)
-                    salary_str = f"₹{salary/100000:.1f}L" if salary > 0 else "N/A"
-                    st.markdown(f"""
-                    **{idx}. {row.get('role', 'Unknown')}**
-                    - Postings: {row.get('job_count', 0)}
-                    - Avg Salary: {salary_str}
-                    - Status: ✅ High Demand
-                    """)
-            except Exception as e:
-                st.info("No role data available")
-        
-        with col_declining:
-            st.markdown("#### 📊 ROLE DIVERSITY")
+            with col1:
+                st.markdown(f"**{idx}. {row['role']}**")
             
-            try:
-                total_roles = len(role_summary)
-                total_postings = role_summary['job_count'].sum()
-                avg_salary = role_summary['avg_salary'].mean()
-                
-                st.markdown(f"""
-                - **Total Roles**: {total_roles}
-                - **Total Postings**: {total_postings:,.0f}
-                - **Avg Salary**: ₹{avg_salary/100000:.1f}L
-                - **Most Common Role**: {role_summary.iloc[0]['role'] if len(role_summary) > 0 else 'N/A'}
-                """)
-            except Exception as e:
-                st.info("No summary data available")
-    else:
-        st.info("⚠️ Role summary data not available")
+            with col2:
+                salary = int(row['avg_salary']) if row['avg_salary'] > 0 else 0
+                st.markdown(f"₹{salary:,}")
+            
+            with col3:
+                total_jobs = len(df[df['role'] == row['role']])
+                st.markdown(f"{total_jobs} jobs")
+            
+            with col4:
+                risk = row.get('ai_risk', 'Medium')
+                risk_icon = "🔴" if "High" in str(risk) else ("🟡" if "Medium" in str(risk) else "🟢")
+                st.markdown(f"{risk_icon} {risk}")
+    except Exception as e:
+        st.info("⚠️ Could not display top roles")
     
     st.divider()
     
-    st.markdown("### 🚀 Future Predictions")
+    # AI Risk Analysis
+    st.markdown("### 🤖 AI Automation Risk Overview")
     
-    if forecaster:
-        # Skill combinations that will define new roles
-        try:
-            skill_combos = forecaster.get_skill_combinations()
-            
-            st.markdown("#### Most Common Skill Combinations (Future Roles)")
-            
-            for idx, (combo, count) in enumerate(skill_combos[:8], 1):
-                st.markdown(f"**{idx}. {combo}** ({count} roles)")
-        except Exception as e:
-            st.info("Skill combination analysis not available")
+    try:
+        risk_counts = df['ai_risk'].value_counts().to_dict()
+        
+        high_risk = risk_counts.get('High Risk', 0)
+        med_risk = risk_counts.get('Medium Risk', 0) + risk_counts.get('Medium', 0)
+        low_risk = risk_counts.get('Low Risk', 0) + risk_counts.get('Safe', 0)
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("🔴 High Risk Roles", high_risk)
+        
+        with col2:
+            st.metric("🟡 Medium Risk Roles", med_risk)
+        
+        with col3:
+            st.metric("🟢 Low Risk Roles", low_risk)
+    except Exception as e:
+        st.info("⚠️ AI Risk analysis not available")
 
 # ===============================================================================
-# TAB 4: SKILL TRENDS
+# TAB 4: KEY INSIGHTS
 # ===============================================================================
 with tab4:
-    st.markdown("### 🎓 Tech Skill Trends")
-    
-    # Top emerging skills across all jobs
-    st.markdown("#### 🌱 Most Emerging Skills")
-    
-    col1, col2 = st.columns([0.5, 0.5])
-    
-    with col1:
-        # Extract emerging skills
-        all_emerging = []
-        for emerging_str in df['emerging_skills'].dropna():
-            try:
-                if isinstance(emerging_str, str):
-                    skills = eval(emerging_str)
-                    all_emerging.extend(skills)
-            except:
-                pass
-        
-        if all_emerging:
-            from collections import Counter
-            emerging_counts = Counter(all_emerging)
-            emerging_df = pd.DataFrame(emerging_counts.most_common(10), columns=['Skill', 'Count'])
-            
-            fig = px.bar(
-                emerging_df,
-                x='Count',
-                y='Skill',
-                orientation='h',
-                title="Top Emerging Skills",
-                labels={'Count': 'Frequency'}
-            )
-            fig.update_layout(template="plotly_dark", height=400)
-            st.plotly_chart(fig, use_container_width=True)
-    
-    with col2:
-        # Top stable skills
-        all_skills = []
-        for skill_freq_str in df['skill_frequency'].dropna():
-            try:
-                if isinstance(skill_freq_str, str):
-                    skills_dict = eval(skill_freq_str)
-                    all_skills.extend(list(skills_dict.keys()))
-            except:
-                pass
-        
-        if all_skills:
-            all_skills_counter = Counter(all_skills)
-            top_skills_df = pd.DataFrame(all_skills_counter.most_common(10), columns=['Skill', 'Frequency'])
-            
-            fig = px.bar(
-                top_skills_df,
-                x='Frequency',
-                y='Skill',
-                orientation='h',
-                title="Top In-Demand Skills (Stable)",
-                labels={'Frequency': 'Count'}
-            )
-            fig.update_layout(template="plotly_dark", height=400)
-            st.plotly_chart(fig, use_container_width=True)
-
-# ===============================================================================
-# TAB 5: KEY INSIGHTS & RECOMMENDATIONS
-# ===============================================================================
-with tab5:
     st.markdown("### 💡 Market Insights & Recommendations")
     
     col1, col2 = st.columns(2)
@@ -320,11 +236,11 @@ with tab5:
     with col1:
         st.markdown("#### 🎯 For Job Seekers")
         st.markdown("""
-        1. **Focus on Growth Roles** - Prioritize roles with increasing demand
+        1. **Focus on Growth Roles** - Look for roles with increasing demand
         2. **Learn Emerging Skills** - AI, GenAI, and MLOps are becoming essential
-        3. **Develop AI Complementary Skills** - Critical thinking, leadership, creativity
-        4. **Build Diverse Skills** - Combine multiple complementary skills for resilience
-        5. **Stay Updated** - Industry trends change rapidly; continuous learning is key
+        3. **Develop Complementary Skills** - Critical thinking and leadership
+        4. **Build Diverse Skills** - Combine multiple skills for resilience
+        5. **Stay Updated** - Industry trends change; continuous learning is key
         """)
     
     with col2:
@@ -340,194 +256,14 @@ with tab5:
                 - **Total Roles**: {total_roles}
                 - **Total Postings**: {total_postings:,.0f}
                 - **Avg Salary**: ₹{avg_salary/100000:.1f}L
-                - **Market Size**: ${total_postings:,.0f} positions
+                - **Market Size**: Growing
                 """)
             except Exception as e:
                 pass
-    
-    st.divider()
-    
-    st.markdown("#### ⚠️ AI Automation Risk by Role Category")
-    
-    try:
-        risk_by_role = df.groupby('role')['ai_risk'].apply(lambda x: (x == 'High Risk').sum() / len(x) * 100).sort_values(ascending=False).head(10)
-        
-        fig = px.bar(
-            x=risk_by_role.values,
-            y=risk_by_role.index,
-            orientation='h',
-            title="Roles with Highest AI Automation Risk (%)",
-            labels={'x': 'High Risk %', 'y': 'Role'}
-        )
-        fig.update_layout(template="plotly_dark", height=400)
-        st.plotly_chart(fig, use_container_width=True)
-    except:
-        st.info("Risk analysis not available")
 
 st.divider()
-
-st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #94a3b8; font-size: 0.9em;'>
-💡 Use market trends to inform your career decisions.
-Combine growth potential with job security and personal interest for optimal career planning.
+<div style='text-align: center; color: #94a3b8; font-size: 0.85em; margin-top: 30px;'>
+💡 Use these market insights to make informed career decisions | Data powered by FutureLens
 </div>
 """, unsafe_allow_html=True)
-
-st.markdown("")
-
-# ---------------------------
-# 🔹 TOP OPPORTUNITY ROLES
-# ---------------------------
-st.markdown("<div class='section-header'>🌟 Top Earning Roles</div>", unsafe_allow_html=True)
-
-try:
-    top_opportunities = df.nlargest(5, 'avg_salary')[['role', 'avg_salary', 'ai_risk']]
-    
-    for idx, (_, row) in enumerate(top_opportunities.iterrows(), 1):
-        col1, col2, col3, col4 = st.columns([0.4, 0.2, 0.2, 0.2])
-        
-        with col1:
-            st.markdown(f"""
-            <div style="color: #f1f5f9; font-weight: 600;">
-                {idx}. {row['role']}
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            salary = int(row['avg_salary']) if row['avg_salary'] > 0 else 0
-            st.markdown(f"""
-            <div style="color: #6366f1; font-weight: 700;">
-                ₹ {salary:,}
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col3:
-            total_jobs = len(df[df['role'] == row['role']])
-            st.markdown(f"""
-            <div style="color: #cbd5e1;">
-                {total_jobs} jobs
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col4:
-            risk = row.get('ai_risk', 'Medium')
-            risk_icon = "🔴" if risk == "High Risk" else ("🟡" if "Medium" in str(risk) else "🟢")
-            st.markdown(f"""
-            <div style="color: #cbd5e1;">
-                {risk_icon} {risk}
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.divider()
-except Exception as e:
-    st.info("⚠️ Could not display top opportunities")
-
-st.markdown("")
-
-# ---------------------------
-# 🔹 SALARY DISTRIBUTION
-# ---------------------------
-st.markdown("<div class='section-header'>💰 Salary Distribution Across Roles</div>", unsafe_allow_html=True)
-
-salary_data = df.sort_values('avg_salary', ascending=False)[['role', 'avg_salary']].head(10)
-
-col1, col2 = st.columns([0.6, 0.4])
-
-with col1:
-    st.bar_chart(salary_data.set_index('role'), use_container_width=True)
-
-with col2:
-    st.markdown("")
-    st.markdown("""
-    <div class="info-box">
-        <strong>💡 Salary Insights</strong><br>
-        Higher salaries typically correlate with:
-        <br>• Specialized technical skills
-        <br>• Experience requirements
-        <br>• Growing demand in market
-        <br>• Lower AI automation risk
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("")
-
-# ---------------------------
-# 🔹 AI RISK ANALYSIS
-# ---------------------------
-st.markdown("<div class='section-header'>🤖 AI Automation Risk Overview</div>", unsafe_allow_html=True)
-
-try:
-    risk_counts = df['ai_risk'].value_counts().to_dict()
-    
-    high_risk = risk_counts.get('High Risk', 0)
-    med_risk = risk_counts.get('Medium Risk', 0) + risk_counts.get('Medium', 0)
-    low_risk = risk_counts.get('Low Risk', 0) + risk_counts.get('Safe', 0)
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown(f"""
-        <div class="metric-card" style="border-left: 4px solid #ef4444;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🔴</div>
-            <div class="metric-label">High Risk</div>
-            <div class="metric-value">{high_risk}</div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown(f"""
-        <div class="metric-card" style="border-left: 4px solid #f59e0b;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🟡</div>
-            <div class="metric-label">Medium Risk</div>
-            <div class="metric-value">{med_risk}</div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown(f"""
-        <div class="metric-card" style="border-left: 4px solid #10b981;">
-            <div style="font-size: 28px; margin-bottom: 10px;">🟢</div>
-            <div class="metric-label">Low Risk</div>
-            <div class="metric-value">{low_risk}</div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Roles</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("")
-except Exception as e:
-    st.info("⚠️ AI Risk analysis not available")
-# 🔹 RECOMMENDATIONS
-# ---------------------------
-st.markdown("<div class='section-header'>✅ Career Recommendations</div>", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("""
-    <div class="success-box">
-        <strong>🎯 Best Career Moves</strong><br>
-        • Focus on roles with <strong>Increasing Demand</strong><br>
-        • Pursue <strong>Low AI Risk</strong> positions<br>
-        • Learn emerging skills in high-demand roles<br>
-        • Build complementary human skills (creativity, leadership)
-    </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
-    <div class="info-box" style="border-left-color: #f59e0b;">
-        <strong>⚠️ Areas to Watch</strong><br>
-        • Roles with <strong>High AI Risk</strong> need upskilling<br>
-        • Declining demand roles show fewer opportunities<br>
-        • Medium salaries with declining demand need pivot<br>
-        • Consider adjacent specializations
-    </div>
-    """, unsafe_allow_html=True)
-
-# ---------------------------
-# 🔹 FOOTER
-# ---------------------------
-render_footer()
