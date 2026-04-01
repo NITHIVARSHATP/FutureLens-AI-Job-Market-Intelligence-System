@@ -379,45 +379,49 @@ st.markdown("")
 # ---------------------------
 # 🔹 TOP OPPORTUNITY ROLES
 # ---------------------------
-st.markdown("<div class='section-header'>🌟 Top Opportunities (Increasing Demand)</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header'>🌟 Top Earning Roles</div>", unsafe_allow_html=True)
 
-top_opportunities = df[df['demand_trend'] == 'Increasing'].nlargest(5, 'avg_salary')
-
-for idx, (_, row) in enumerate(top_opportunities.iterrows(), 1):
-    col1, col2, col3, col4 = st.columns([0.4, 0.2, 0.2, 0.2])
+try:
+    top_opportunities = df.nlargest(5, 'avg_salary')[['role', 'avg_salary', 'ai_risk']]
     
-    with col1:
-        st.markdown(f"""
-        <div style="color: #f1f5f9; font-weight: 600;">
-            {idx}. {row['role']}
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown(f"""
-        <div style="color: #6366f1; font-weight: 700;">
-            ₹ {int(row['avg_salary']):,}
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        skills_count = len(row['top_skills'])
-        st.markdown(f"""
-        <div style="color: #cbd5e1;">
-            {skills_count} skills
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        risk = max(row['ai_risk_distribution'], key=row['ai_risk_distribution'].get)
-        risk_icon = "🔴" if risk == "High" else ("🟡" if risk == "Medium" else "🟢")
-        st.markdown(f"""
-        <div style="color: #cbd5e1;">
-            {risk_icon} {risk}
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.divider()
+    for idx, (_, row) in enumerate(top_opportunities.iterrows(), 1):
+        col1, col2, col3, col4 = st.columns([0.4, 0.2, 0.2, 0.2])
+        
+        with col1:
+            st.markdown(f"""
+            <div style="color: #f1f5f9; font-weight: 600;">
+                {idx}. {row['role']}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            salary = int(row['avg_salary']) if row['avg_salary'] > 0 else 0
+            st.markdown(f"""
+            <div style="color: #6366f1; font-weight: 700;">
+                ₹ {salary:,}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            total_jobs = len(df[df['role'] == row['role']])
+            st.markdown(f"""
+            <div style="color: #cbd5e1;">
+                {total_jobs} jobs
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col4:
+            risk = row.get('ai_risk', 'Medium')
+            risk_icon = "🔴" if risk == "High Risk" else ("🟡" if "Medium" in str(risk) else "🟢")
+            st.markdown(f"""
+            <div style="color: #cbd5e1;">
+                {risk_icon} {risk}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.divider()
+except Exception as e:
+    st.info("⚠️ Could not display top opportunities")
 
 st.markdown("")
 
