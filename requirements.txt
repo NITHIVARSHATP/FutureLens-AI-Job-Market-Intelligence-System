@@ -1,4 +1,11 @@
-requests
+streamlit
+streamlit-option-menu
 pandas
+numpy
+plotly
+kaleido
+scikit-learn
+statsmodels
+requests
 spacy
 python-dotenv

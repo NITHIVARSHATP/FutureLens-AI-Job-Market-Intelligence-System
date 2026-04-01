@@ -369,12 +369,6 @@ st.markdown("""
 Combine growth potential with job security and personal interest for optimal career planning.
 </div>
 """, unsafe_allow_html=True)
-            </div>
-            <div style="color: #6366f1; font-weight: 700; font-size: 18px;">
-                {count} roles ({percentage:.1f}%)
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
 
 st.markdown("")
 

@@ -247,7 +247,7 @@ with tab4:
             "Business Analyst"
         ])
         
-        experience_level = st.select_slider("Years of experience:", 0, 20, 3)
+        experience_level = st.slider("Years of experience:", 0, 20, 3)
         
         interests = st.multiselect("Areas of interest:", [
             "AI/ML",
