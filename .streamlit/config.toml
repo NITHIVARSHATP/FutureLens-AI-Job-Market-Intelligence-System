@@ -1,0 +1,17 @@
+[server]
+headless = true
+port = 8502
+address = "0.0.0.0"
+baseUrlPath = ""
+enableCORS = true
+enableXsrfProtection = true
+
+[theme]
+primaryColor = "#FF6B6B"
+backgroundColor = "#0f1117"
+secondaryBackgroundColor = "#161b22"
+textColor = "#c9d1d9"
+font = "sans serif"
+
+[logger]
+level = "info"
