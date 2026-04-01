@@ -188,40 +188,44 @@ with tab3:
     st.markdown("### 🌟 Emerging & Growing Roles")
     
     if role_summary is not None:
-        # Sort by growth rate and display top emerging roles
-        emerginging_roles = role_summary.nlargest(10, 'demand_trend' if 'demand_trend' in role_summary.columns else 'growth_rate' if 'growth_rate' not in role_summary else 'demand_trend')
+        # Sort by job_count for top roles
+        top_roles = role_summary.nlargest(10, 'job_count')
         
         col_emerging, col_declining  = st.columns([0.5, 0.5])
         
         with col_emerging:
-            st.markdown("#### 📈 TOP EMERGING ROLES (Growth Opportunities)")
+            st.markdown("#### 📈 TOP ROLES BY DEMAND")
             
             try:
-                growing = role_summary[role_summary['demand_trend'] == 'Growing'].nlargest(5, 'job_count')
-                for idx, (_, row) in enumerate(growing.iterrows(), 1):
+                top_5 = role_summary.nlargest(5, 'job_count')
+                for idx, (_, row) in enumerate(top_5.iterrows(), 1):
+                    salary = row.get('avg_salary', 0)
+                    salary_str = f"₹{salary/100000:.1f}L" if salary > 0 else "N/A"
                     st.markdown(f"""
-                    **{idx}. {row['role']}**
-                    - Postings: {row['job_count']}
-                    - Avg Salary: ₹{row['avg_salary']/100000:.1f}L
-                    - Status: ✅ Growing Demand
+                    **{idx}. {row.get('role', 'Unknown')}**
+                    - Postings: {row.get('job_count', 0)}
+                    - Avg Salary: {salary_str}
+                    - Status: ✅ High Demand
                     """)
-            except:
-                st.info("No growing role data available")
+            except Exception as e:
+                st.info("No role data available")
         
         with col_declining:
-            st.markdown("#### 📉 ROLES TO MONITOR (Declining Demand)")
+            st.markdown("#### 📊 ROLE DIVERSITY")
             
             try:
-                declining = role_summary[role_summary['demand_trend'] == 'Declining'].nlargest(5, 'job_count')
-                for idx, (_, row) in enumerate(declining.iterrows(), 1):
-                    st.markdown(f"""
-                    **{idx}. {row['role']}**
-                    - Postings: {row['job_count']}
-                    - Avg Salary: ₹{row['avg_salary']/100000:.1f}L  
-                    - Status: ⚠️ Declining Demand
-                    """)
-            except:
-                st.info("No declining role data available")
+                total_roles = len(role_summary)
+                total_postings = role_summary['job_count'].sum()
+                avg_salary = role_summary['avg_salary'].mean()
+                
+                st.markdown(f"""
+                - **Total Roles**: {total_roles}
+                - **Total Postings**: {total_postings:,.0f}
+                - **Avg Salary**: ₹{avg_salary/100000:.1f}L
+                - **Most Common Role**: {role_summary.iloc[0]['role'] if len(role_summary) > 0 else 'N/A'}
+                """)
+            except Exception as e:
+                st.info("No summary data available")
     else:
         st.info("⚠️ Role summary data not available")
     
@@ -328,17 +332,17 @@ with tab5:
         
         if role_summary is not None:
             try:
-                growing_count = len(role_summary[role_summary['demand_trend'] == 'Growing'])
-                declining_count = len(role_summary[role_summary['demand_trend'] == 'Declining'])
-                stable_count = len(role_summary[role_summary['demand_trend'] == 'Stable'])
+                total_roles = len(role_summary)
+                total_postings = role_summary['job_count'].sum()
+                avg_salary = role_summary['avg_salary'].mean()
                 
                 st.markdown(f"""
-                - **Growing Roles**: {growing_count}
-                - **Stable Roles**: {stable_count}
-                - **Declining Roles**: {declining_count}
-                - **Total Roles Tracked**: {len(role_summary)}
+                - **Total Roles**: {total_roles}
+                - **Total Postings**: {total_postings:,.0f}
+                - **Avg Salary**: ₹{avg_salary/100000:.1f}L
+                - **Market Size**: ${total_postings:,.0f} positions
                 """)
-            except:
+            except Exception as e:
                 pass
     
     st.divider()
