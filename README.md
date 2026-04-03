@@ -117,9 +117,9 @@ For any selected job role, the system provides:
 
 ## 👩‍💻 Author
 
-**Nithivarsha T P - 036**
-**Purushothaman B - 039**
-**Srisaran J      - 306**
+**036 - Nithivarsha T P** <br>
+**039 - Purushothaman Balakrishnan** <br>
+**306 - Srisaran Jaganathan**
 
 ---
 
